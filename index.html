@@ -323,7 +323,21 @@
         let qrcodeInstance = null;
 
         function generateThisPageQR() {
-            const currentUrl = window.location.href;
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                alert('Por favor, introduce primero un enlace en el campo de texto');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert('Por favor, introduce un enlace válido que comience con http:// o https://');
+                return;
+            }
+
+            const currentUrl = window.location.href.split('?')[0];
+            const fullUrl = currentUrl + '?url=' + encodeURIComponent(url);
+            
             const qrContainer = document.getElementById('qrContainer');
             const qrcodeDiv = document.getElementById('qrcode');
             const btnDownload = document.getElementById('btnDownload');
@@ -331,7 +345,7 @@
             qrcodeDiv.innerHTML = '';
 
             qrcodeInstance = new QRCode(qrcodeDiv, {
-                text: currentUrl,
+                text: fullUrl,
                 width: 256,
                 height: 256,
                 colorDark: "#000000",
@@ -343,7 +357,7 @@
             btnDownload.disabled = false;
 
             const notification = document.getElementById('notification');
-            notification.textContent = '✅ QR generado con la URL de esta página';
+            notification.textContent = '✅ QR generado con el enlace precargado';
             notification.classList.add('show');
             
             setTimeout(() => {
