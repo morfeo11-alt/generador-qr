@@ -236,8 +236,11 @@
 
         <div style="text-align: center; margin-bottom: 20px;">
             <button class="btn-generate" onclick="generateThisPageQR()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                🔗 Generar QR de Esta Página
+                🔗 Generar QR con Este Enlace
             </button>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                Este QR abrirá esta página con el enlace precargado para copiar
+            </p>
         </div>
 
         <div class="qr-container" id="qrContainer">
@@ -444,6 +447,25 @@
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 generateQR();
+            }
+        });
+
+        // Cargar URL desde parámetro si existe
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const preloadedUrl = urlParams.get('url');
+            
+            if (preloadedUrl) {
+                document.getElementById('urlInput').value = decodeURIComponent(preloadedUrl);
+                
+                // Mostrar notificación
+                const notification = document.getElementById('notification');
+                notification.textContent = '✅ Enlace precargado desde el QR';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
             }
         });
     </script>
