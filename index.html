@@ -35,14 +35,17 @@
         .button-group { display: flex; gap: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
         .button-group.hidden { opacity: 0; height: 0; margin-bottom: 0; overflow: hidden; pointer-events: none; }
         button {
-            flex: 1; padding: 15px; border: none; border-radius: 10px;
+            padding: 15px; border: none; border-radius: 10px;
             font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
         }
         .btn-generate { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
         .btn-copy { background: #4CAF50; color: white; }
         .btn-copy:hover { background: #45a049; transform: translateY(-2px); }
-        .btn-download { background: #2196F3; color: white; }
+        .btn-download { 
+            background: #2196F3; color: white; 
+            width: 100%; margin-top: 20px; /* ⭐⭐ NUEVO: Botón ancho y separado */
+        }
         .btn-download:hover { background: #0b7dda; transform: translateY(-2px); }
         .btn-download:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         .qr-container { text-align: center; margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 15px; display: none; }
@@ -80,6 +83,10 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 10px; display: none;
         }
         .welcome-message.show { display: block; }
+        .download-section { 
+            text-align: center; margin-top: 20px; 
+            transition: all 0.3s ease; /* ⭐⭐ NUEVA SECCIÓN */
+        }
         @keyframes slideIn {
             from { transform: translateX(400px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -90,6 +97,7 @@
             .button-group { flex-direction: column; }
             .link-actions { flex-direction: column; }
             .link-actions button { min-width: 100%; }
+            .btn-download { width: 100%; }
         }
     </style>
 </head>
@@ -107,10 +115,10 @@
             <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/AKfycbz8qS30EqhNVlF8ogrnUAz7cy9vbwcMkZ0GGsA8x_ezbXxgTG5w1Os_fnwi-jdecVy9Sg/exec">
         </div>
 
+        <!-- ⭐⭐ CAMBIO: Botones normales que se ocultan -->
         <div class="button-group" id="buttonGroup">
             <button class="btn-generate" onclick="generateQR()">Generar QR</button>
             <button class="btn-copy" onclick="copyLink()">📋 Copiar Enlace</button>
-            <button class="btn-download" id="btnDownload" onclick="downloadQR()" disabled>⬇️ Descargar QR</button>
         </div>
 
         <div class="extra-info" id="extraInfo">
@@ -124,6 +132,11 @@
 
         <div class="qr-container" id="qrContainer">
             <div id="qrcode"></div>
+        </div>
+
+        <!-- ⭐⭐ NUEVA SECCIÓN: Botón de descarga separado -->
+        <div class="download-section" id="downloadSection">
+            <button class="btn-download" id="btnDownload" onclick="downloadQR()" disabled>⬇️ Descargar QR</button>
         </div>
 
         <div class="link-display" id="linkDisplay">
@@ -211,7 +224,6 @@
         let qrcodeInstance = null;
         let currentGeneratedUrl = '';
         
-        // ⭐⭐ CAMBIO CLAVE: URL FIJA DE GITHUB PAGES ⭐⭐
         const GITHUB_PAGES_URL = 'https://morfeo11-alt.github.io/generador-qr/';
 
         function showNotification(message) {
@@ -221,7 +233,6 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
-        // ⭐⭐ FUNCIÓN CORREGIDA: Usa siempre la URL de GitHub ⭐⭐
         function generateThisPageQR() {
             const url = document.getElementById('urlInput').value.trim();
             
@@ -236,7 +247,6 @@
             }
 
             try {
-                // ⭐⭐ CAMBIO: Usar la URL de GitHub Pages en lugar de la local ⭐⭐
                 const fullUrl = GITHUB_PAGES_URL + '?url=' + encodeURIComponent(url);
                 console.log('Generando QR para:', fullUrl);
                 
@@ -244,12 +254,11 @@
                 const qrcodeDiv = document.getElementById('qrcode');
                 const linkDisplay = document.getElementById('linkDisplay');
                 const linkDisplayText = document.getElementById('linkDisplayText');
-                const btnDownload = document.getElementById('btnDownload'); // ⭐⭐ OBTENER BOTÓN
+                const btnDownload = document.getElementById('btnDownload');
 
                 // Limpiar QR anterior
                 qrcodeDiv.innerHTML = '';
 
-                // Verificar que la biblioteca esté cargada
                 if (typeof QRCode === 'undefined') {
                     alert('Error: La biblioteca QRCode no está cargada. Recarga la página.');
                     return;
@@ -265,28 +274,29 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                // Mostrar el QR
+                // Mostrar el QR y el botón de descarga
                 qrContainer.classList.add('show');
                 
-                // Mostrar el enlace original (no la URL de GitHub)
+                // ⭐⭐ CAMBIO: Mostrar sección de descarga
+                document.getElementById('downloadSection').style.display = 'block';
+                
+                // Habilitar botón de descarga
+                btnDownload.disabled = false;
+                
+                // Mostrar el enlace
                 linkDisplayText.textContent = url;
                 linkDisplay.classList.add('show');
-                
-                // ⭐⭐ CORRECCIÓN: HABILITAR BOTÓN DE DESCARGA ⭐⭐
-                btnDownload.disabled = false;
-                console.log('Botón de descarga habilitado');
                 
                 // Guardar la URL para copiar
                 currentGeneratedUrl = url;
 
-                // Ocultar elementos del formulario (pero mantener el QR visible)
+                // Ocultar elementos del formulario (pero NO la sección de descarga)
                 setTimeout(() => {
                     hideFormElements();
                 }, 300);
 
                 showNotification('✅ QR generado con el enlace precargado');
                 
-                // Información adicional
                 console.log('QR generado correctamente');
                 console.log('URL en el QR:', fullUrl);
                 console.log('Enlace original:', url);
@@ -317,6 +327,10 @@
 
             showFormElements();
             welcomeMessage.classList.remove('show');
+            
+            // ⭐⭐ CAMBIO: Mostrar sección de descarga
+            document.getElementById('downloadSection').style.display = 'block';
+            
             qrcodeDiv.innerHTML = '';
 
             try {
@@ -404,24 +418,24 @@
             document.getElementById('inputGroup').classList.add('hidden');
             document.getElementById('buttonGroup').classList.add('hidden');
             document.getElementById('extraInfo').classList.add('hidden');
-            // ⭐⭐ NOTA: NO ocultamos el QR container, solo el formulario
+            // ⭐⭐ NOTA: NO ocultamos la sección de descarga
         }
 
         function showFormElements() {
             document.getElementById('inputGroup').classList.remove('hidden');
             document.getElementById('buttonGroup').classList.remove('hidden');
             document.getElementById('extraInfo').classList.remove('hidden');
+            // ⭐⭐ Asegurar que la sección de descarga se muestre
+            document.getElementById('downloadSection').style.display = 'block';
         }
 
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') generateQR();
         });
 
-        // ⭐⭐ CORRECCIÓN CLAVE: Detectar parámetro al cargar la página ⭐⭐
         function checkForPreloadedUrl() {
             console.log('🔍 Buscando parámetros URL en la página...');
             
-            // Obtener los parámetros de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const preloadedUrl = urlParams.get('url');
             
@@ -433,27 +447,18 @@
                     const decodedUrl = decodeURIComponent(preloadedUrl);
                     console.log('URL decodificada:', decodedUrl);
                     
-                    // Establecer el valor en el input
                     document.getElementById('urlInput').value = decodedUrl;
                     
-                    // ⭐⭐ CAMBIO IMPORTANTE: Ocultar formulario y mostrar solo enlace ⭐⭐
+                    // ⭐⭐ CAMBIO: Ocultar formulario pero mostrar sección de descarga
                     hideFormElements();
+                    document.getElementById('downloadSection').style.display = 'none'; // Ocultar descarga cuando viene de QR
                     
-                    // Mostrar mensaje de bienvenida
                     document.getElementById('welcomeMessage').classList.add('show');
-                    
-                    // Mostrar el enlace en la sección especial
                     document.getElementById('linkDisplayText').textContent = decodedUrl;
                     document.getElementById('linkDisplay').classList.add('show');
-                    
-                    // Guardar la URL para copiar
                     currentGeneratedUrl = decodedUrl;
                     
-                    // Mostrar notificación
                     showNotification('✅ Enlace precargado desde el QR');
-                    
-                    // IMPORTANTE: No ocultar el botón de descarga cuando se carga desde QR
-                    // El botón ya está habilitado por defecto en el HTML
                     
                     console.log('✅ Configuración completada para URL precargada');
                     
@@ -463,19 +468,17 @@
                 }
             } else {
                 console.log('No se encontró parámetro "url" en la URL');
-                // Si no hay parámetro, mostrar el formulario completo
                 showFormElements();
+                // ⭐⭐ Ocultar sección de descarga al inicio
+                document.getElementById('downloadSection').style.display = 'none';
             }
         }
 
-        // Ejecutar cuando la página cargue
         window.addEventListener('DOMContentLoaded', function() {
             console.log('📄 Página cargada, ejecutando checkForPreloadedUrl...');
-            // Pequeño delay para asegurar que todo esté listo
             setTimeout(checkForPreloadedUrl, 100);
         });
 
-        // También ejecutar cuando la página esté completamente cargada
         window.addEventListener('load', function() {
             console.log('🚀 Página completamente cargada');
             checkForPreloadedUrl();
