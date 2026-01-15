@@ -401,21 +401,68 @@
             if (e.key === 'Enter') generateQR();
         });
 
-        // Cargar URL desde parámetro
-        window.addEventListener('DOMContentLoaded', function() {
+        // ⭐⭐ CORRECCIÓN CLAVE: Detectar parámetro al cargar la página ⭐⭐
+        function checkForPreloadedUrl() {
+            console.log('🔍 Buscando parámetros URL en la página...');
+            
+            // Obtener los parámetros de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const preloadedUrl = urlParams.get('url');
             
+            console.log('Parámetros encontrados:', window.location.search);
+            console.log('Valor de "url":', preloadedUrl);
+            
             if (preloadedUrl) {
-                const decodedUrl = decodeURIComponent(preloadedUrl);
-                document.getElementById('urlInput').value = decodedUrl;
-                hideFormElements();
-                document.getElementById('welcomeMessage').classList.add('show');
-                document.getElementById('linkDisplayText').textContent = decodedUrl;
-                document.getElementById('linkDisplay').classList.add('show');
-                currentGeneratedUrl = decodedUrl;
-                showNotification('✅ Enlace precargado desde el QR');
+                try {
+                    const decodedUrl = decodeURIComponent(preloadedUrl);
+                    console.log('URL decodificada:', decodedUrl);
+                    
+                    // Establecer el valor en el input
+                    document.getElementById('urlInput').value = decodedUrl;
+                    
+                    // ⭐⭐ CAMBIO IMPORTANTE: Ocultar formulario y mostrar solo enlace ⭐⭐
+                    hideFormElements();
+                    
+                    // Mostrar mensaje de bienvenida
+                    document.getElementById('welcomeMessage').classList.add('show');
+                    
+                    // Mostrar el enlace en la sección especial
+                    document.getElementById('linkDisplayText').textContent = decodedUrl;
+                    document.getElementById('linkDisplay').classList.add('show');
+                    
+                    // Guardar la URL para copiar
+                    currentGeneratedUrl = decodedUrl;
+                    
+                    // Mostrar notificación
+                    showNotification('✅ Enlace precargado desde el QR');
+                    
+                    // También ocultar el QR container si está visible
+                    document.getElementById('qrContainer').classList.remove('show');
+                    
+                    console.log('✅ Configuración completada para URL precargada');
+                    
+                } catch (error) {
+                    console.error('Error al procesar URL precargada:', error);
+                    showNotification('❌ Error al cargar el enlace del QR');
+                }
+            } else {
+                console.log('No se encontró parámetro "url" en la URL');
+                // Si no hay parámetro, mostrar el formulario completo
+                showFormElements();
             }
+        }
+
+        // Ejecutar cuando la página cargue
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 Página cargada, ejecutando checkForPreloadedUrl...');
+            // Pequeño delay para asegurar que todo esté listo
+            setTimeout(checkForPreloadedUrl, 100);
+        });
+
+        // También ejecutar cuando la página esté completamente cargada
+        window.addEventListener('load', function() {
+            console.log('🚀 Página completamente cargada');
+            checkForPreloadedUrl();
         });
     </script>
 </body>
