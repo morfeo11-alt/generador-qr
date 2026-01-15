@@ -136,28 +136,28 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .generated-url-display {
+        .link-display {
             background: #f0f4ff;
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
             margin-bottom: 20px;
             border-left: 4px solid #667eea;
-            text-align: left;
+            text-align: center;
             display: none;
         }
 
-        .generated-url-display.show {
+        .link-display.show {
             display: block;
         }
 
-        .generated-url-display h3 {
+        .link-display h3 {
             color: #333;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
 
-        .generated-url-display p {
+        .link-display p {
             margin: 0;
             font-size: 14px;
             color: #555;
@@ -169,15 +169,17 @@
             margin-bottom: 15px;
         }
 
-        .url-actions {
+        .link-actions {
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            justify-content: center;
         }
 
-        .url-actions button {
-            padding: 12px 15px;
+        .link-actions button {
+            padding: 12px 20px;
             font-size: 14px;
+            min-width: 200px;
         }
 
         .instructions {
@@ -262,8 +264,12 @@
                 flex-direction: column;
             }
 
-            .url-actions {
+            .link-actions {
                 flex-direction: column;
+            }
+
+            .link-actions button {
+                min-width: 100%;
             }
         }
     </style>
@@ -288,7 +294,7 @@
                 🔗 Generar QR con Este Enlace
             </button>
             <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                Este QR abrirá esta página con el enlace precargado para copiar
+                Genera un QR que apunta a esta página con el enlace precargado para copiar
             </p>
         </div>
 
@@ -296,14 +302,17 @@
             <div id="qrcode"></div>
         </div>
 
-        <!-- Nueva sección que se mostrará cuando se genere el QR -->
-        <div class="generated-url-display" id="generatedUrlDisplay">
+        <!-- Nueva sección que se muestra solo cuando se genera el QR con enlace -->
+        <div class="link-display" id="linkDisplay">
             <h3>🔗 Enlace incluido en el QR:</h3>
-            <p id="generatedUrlText"></p>
-            <div class="url-actions">
-                <button class="btn-copy" onclick="copyGeneratedUrl()" style="flex: 1;">📋 Copiar este enlace</button>
-                <button class="btn-download" onclick="downloadGeneratedQR()" style="flex: 1;">⬇️ Descargar este QR</button>
+            <p id="linkDisplayText"></p>
+            <div class="link-actions">
+                <button class="btn-copy" onclick="copyDisplayedLink()">📋 Copiar este enlace</button>
             </div>
+            <p style="font-size: 13px; color: #777; margin-top: 15px; font-style: italic;">
+                Este QR contiene un enlace a esta página generadora de QR con el enlace original precargado.
+                Cuando se escanee, el usuario podrá copiar fácilmente el enlace original.
+            </p>
         </div>
 
         <div class="instructions">
@@ -373,16 +382,6 @@
                     <li><strong>⚠️ Si se abre la app de Google Drive:</strong> Usa el modo privado en el navegador para ver la app web</li>
                 </ul>
             </div>
-
-            <div class="os-section">
-                <h3><span class="icon">ℹ️</span> Información sobre este generador</h3>
-                <ul>
-                    <li>Este generador está alojado en GitHub Pages</li>
-                    <li>URL: <strong>https://morfeo11-alt.github.io/generador-qr/</strong></li>
-                    <li>Puedes compartir este enlace para que otros puedan generar sus propios códigos QR</li>
-                    <li>Para Google Apps Script, usa el botón "Generar QR con Este Enlace"</li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -408,16 +407,59 @@
                 return;
             }
 
+            // Crear la URL con el parámetro
             const currentUrl = window.location.href.split('?')[0];
             const fullUrl = currentUrl + '?url=' + encodeURIComponent(url);
             
-            // Llamar a la función que genera y muestra el QR
-            generateQRWithDisplay(fullUrl, "QR con enlace precargado");
+            const qrContainer = document.getElementById('qrContainer');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const btnDownload = document.getElementById('btnDownload');
+            const linkDisplay = document.getElementById('linkDisplay');
+            const linkDisplayText = document.getElementById('linkDisplayText');
+
+            // Limpiar QR anterior
+            qrcodeDiv.innerHTML = '';
+
+            // Crear nuevo QR
+            qrcodeInstance = new QRCode(qrcodeDiv, {
+                text: fullUrl,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Mostrar el QR
+            qrContainer.classList.add('show');
+            
+            // Mostrar el enlace y el botón de copiar
+            linkDisplayText.textContent = url; // Mostrar el enlace original, no la URL con parámetro
+            linkDisplay.classList.add('show');
+            
+            // Habilitar botón de descarga
+            btnDownload.disabled = false;
+            
+            // Guardar la URL para copiar
+            currentGeneratedUrl = url; // Guardar el enlace original, no la URL con parámetro
+
+            // Mostrar notificación
+            const notification = document.getElementById('notification');
+            notification.textContent = '✅ QR generado con el enlace precargado';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
         function generateQR() {
             const url = document.getElementById('urlInput').value.trim();
-            
+            const qrContainer = document.getElementById('qrContainer');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const btnDownload = document.getElementById('btnDownload');
+            const linkDisplay = document.getElementById('linkDisplay');
+
             if (!url) {
                 alert('Por favor, introduce un enlace');
                 return;
@@ -428,20 +470,8 @@
                 return;
             }
 
-            generateQRWithDisplay(url, "QR personalizado");
-        }
-
-        function generateQRWithDisplay(url, type) {
-            const qrContainer = document.getElementById('qrContainer');
-            const qrcodeDiv = document.getElementById('qrcode');
-            const btnDownload = document.getElementById('btnDownload');
-            const generatedUrlDisplay = document.getElementById('generatedUrlDisplay');
-            const generatedUrlText = document.getElementById('generatedUrlText');
-
-            // Limpiar cualquier QR anterior
             qrcodeDiv.innerHTML = '';
 
-            // Crear el QR
             qrcodeInstance = new QRCode(qrcodeDiv, {
                 text: url,
                 width: 256,
@@ -451,38 +481,17 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            // Mostrar el contenedor del QR
             qrContainer.classList.add('show');
-            
-            // Mostrar la URL generada
-            generatedUrlText.textContent = url;
-            generatedUrlDisplay.classList.add('show');
-            
-            // Habilitar el botón de descarga
             btnDownload.disabled = false;
             
-            // Guardar la URL para usar después
-            currentGeneratedUrl = url;
-
-            // Mostrar notificación
-            const notification = document.getElementById('notification');
-            if (type === "QR con enlace precargado") {
-                notification.textContent = '✅ QR generado con el enlace precargado';
-            } else {
-                notification.textContent = '✅ QR generado correctamente';
-            }
-            notification.classList.add('show');
+            // Ocultar la sección de enlace si está visible
+            linkDisplay.classList.remove('show');
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            // Guardar la URL para copiar
+            currentGeneratedUrl = url;
         }
 
         function downloadQR() {
-            downloadGeneratedQR();
-        }
-
-        function downloadGeneratedQR() {
             const canvas = document.querySelector('#qrcode canvas');
             
             if (!canvas) {
@@ -492,21 +501,7 @@
 
             const url = canvas.toDataURL('image/png');
             const link = document.createElement('a');
-            
-            // Nombre del archivo basado en el tipo de URL
-            if (currentGeneratedUrl.includes('?url=')) {
-                link.download = 'qr-con-enlace-precargado.png';
-            } else {
-                // Intentar extraer el dominio para el nombre del archivo
-                try {
-                    const urlObj = new URL(currentGeneratedUrl);
-                    const domain = urlObj.hostname.replace('www.', '');
-                    link.download = `qr-${domain}.png`;
-                } catch (e) {
-                    link.download = 'codigo-qr.png';
-                }
-            }
-            
+            link.download = 'codigo-qr.png';
             link.href = url;
             link.click();
 
@@ -519,7 +514,7 @@
             }, 3000);
         }
 
-        function copyGeneratedUrl() {
+        function copyDisplayedLink() {
             if (!currentGeneratedUrl) {
                 alert('Primero debes generar un código QR');
                 return;
@@ -527,7 +522,7 @@
 
             navigator.clipboard.writeText(currentGeneratedUrl).then(() => {
                 const notification = document.getElementById('notification');
-                notification.textContent = '✅ Enlace del QR copiado al portapapeles';
+                notification.textContent = '✅ Enlace copiado al portapapeles';
                 notification.classList.add('show');
                 
                 setTimeout(() => {
@@ -584,13 +579,6 @@
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 3000);
-                
-                // Generar automáticamente el QR después de un breve retraso
-                setTimeout(() => {
-                    const currentUrl = window.location.href.split('?')[0];
-                    const fullUrl = currentUrl + '?url=' + encodeURIComponent(decodedUrl);
-                    generateQRWithDisplay(fullUrl, "QR desde enlace precargado");
-                }, 100);
             }
         });
     </script>
