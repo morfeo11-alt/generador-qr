@@ -244,6 +244,7 @@
                 const qrcodeDiv = document.getElementById('qrcode');
                 const linkDisplay = document.getElementById('linkDisplay');
                 const linkDisplayText = document.getElementById('linkDisplayText');
+                const btnDownload = document.getElementById('btnDownload'); // ⭐⭐ OBTENER BOTÓN
 
                 // Limpiar QR anterior
                 qrcodeDiv.innerHTML = '';
@@ -271,13 +272,14 @@
                 linkDisplayText.textContent = url;
                 linkDisplay.classList.add('show');
                 
-                // Habilitar botón de descarga
-                document.getElementById('btnDownload').disabled = false;
+                // ⭐⭐ CORRECCIÓN: HABILITAR BOTÓN DE DESCARGA ⭐⭐
+                btnDownload.disabled = false;
+                console.log('Botón de descarga habilitado');
                 
                 // Guardar la URL para copiar
                 currentGeneratedUrl = url;
 
-                // Ocultar elementos del formulario
+                // Ocultar elementos del formulario (pero mantener el QR visible)
                 setTimeout(() => {
                     hideFormElements();
                 }, 300);
@@ -345,17 +347,30 @@
         }
 
         function downloadQR() {
-            const canvas = document.querySelector('#qrcode canvas');
+            console.log('Intentando descargar QR...');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const canvas = qrcodeDiv.querySelector('canvas');
+            
             if (!canvas) {
-                alert('Primero debes generar un código QR');
+                alert('❌ No se pudo encontrar el código QR. Primero genera un QR.');
+                console.error('Canvas no encontrado en #qrcode:', qrcodeDiv.innerHTML);
                 return;
             }
-            const url = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = 'codigo-qr.png';
-            link.href = url;
-            link.click();
-            showNotification('✅ Código QR descargado');
+
+            try {
+                const url = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'codigo-qr.png';
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showNotification('✅ Código QR descargado');
+                console.log('QR descargado exitosamente');
+            } catch (error) {
+                console.error('Error al descargar QR:', error);
+                alert('❌ Error al descargar el QR: ' + error.message);
+            }
         }
 
         function copyDisplayedLink() {
@@ -389,6 +404,7 @@
             document.getElementById('inputGroup').classList.add('hidden');
             document.getElementById('buttonGroup').classList.add('hidden');
             document.getElementById('extraInfo').classList.add('hidden');
+            // ⭐⭐ NOTA: NO ocultamos el QR container, solo el formulario
         }
 
         function showFormElements() {
@@ -436,8 +452,8 @@
                     // Mostrar notificación
                     showNotification('✅ Enlace precargado desde el QR');
                     
-                    // También ocultar el QR container si está visible
-                    document.getElementById('qrContainer').classList.remove('show');
+                    // IMPORTANTE: No ocultar el botón de descarga cuando se carga desde QR
+                    // El botón ya está habilitado por defecto en el HTML
                     
                     console.log('✅ Configuración completada para URL precargada');
                     
