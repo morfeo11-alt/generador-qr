@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Código QR</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,7 +15,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .container {
             background: white;
             border-radius: 20px;
@@ -29,248 +23,73 @@
             width: 100%;
             padding: 40px;
         }
-
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
-
+        h1 { color: #333; text-align: center; margin-bottom: 30px; font-size: 2em; }
+        .input-group { margin-bottom: 25px; transition: all 0.3s ease; }
+        .input-group.hidden { opacity: 0; height: 0; margin-bottom: 0; overflow: hidden; pointer-events: none; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
         input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px;
+            font-size: 16px; transition: border-color 0.3s;
         }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
+        input[type="text"]:focus { outline: none; border-color: #667eea; }
+        .button-group { display: flex; gap: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
+        .button-group.hidden { opacity: 0; height: 0; margin-bottom: 0; overflow: hidden; pointer-events: none; }
         button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            flex: 1; padding: 15px; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
         }
-
-        .btn-generate {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-copy {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        .btn-download {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-download:hover {
-            background: #0b7dda;
-            transform: translateY(-2px);
-        }
-
-        .btn-download:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .qr-container {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 15px;
-            display: none;
-        }
-
-        .qr-container.show {
-            display: block;
-        }
-
-        #qrcode {
-            display: inline-block;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
+        .btn-generate { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .btn-copy { background: #4CAF50; color: white; }
+        .btn-copy:hover { background: #45a049; transform: translateY(-2px); }
+        .btn-download { background: #2196F3; color: white; }
+        .btn-download:hover { background: #0b7dda; transform: translateY(-2px); }
+        .btn-download:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .qr-container { text-align: center; margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 15px; display: none; }
+        .qr-container.show { display: block; }
+        #qrcode { display: inline-block; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .link-display {
-            background: #f0f4ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid #667eea;
-            text-align: center;
-            display: none;
+            background: #f0f4ff; border-radius: 10px; padding: 20px; margin-top: 20px; margin-bottom: 20px;
+            border-left: 4px solid #667eea; text-align: center; display: none;
         }
-
-        .link-display.show {
-            display: block;
-        }
-
-        .link-display h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
+        .link-display.show { display: block; }
+        .link-display h3 { color: #333; margin-bottom: 10px; font-size: 1.2em; }
         .link-display p {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-            word-break: break-all;
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 15px;
+            margin: 0; font-size: 14px; color: #555; word-break: break-all; background: white;
+            padding: 10px; border-radius: 5px; border: 1px solid #e0e0e0; margin-bottom: 15px;
         }
-
-        .link-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: center;
-        }
-
-        .link-actions button {
-            padding: 12px 20px;
-            font-size: 14px;
-            min-width: 200px;
-        }
-
-        .instructions {
-            margin-top: 30px;
-            padding: 25px;
-            background: #f0f4ff;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-        }
-
-        .instructions h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .os-section {
-            margin-bottom: 25px;
-        }
-
-        .os-section h3 {
-            color: #555;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .os-section ul {
-            margin-left: 20px;
-            line-height: 1.8;
-            color: #666;
-        }
-
-        .os-section li {
-            margin-bottom: 8px;
-        }
-
-        .icon {
-            font-size: 1.3em;
-        }
-
+        .link-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+        .link-actions button { padding: 12px 20px; font-size: 14px; min-width: 200px; }
+        .instructions { margin-top: 30px; padding: 25px; background: #f0f4ff; border-radius: 15px; border-left: 5px solid #667eea; }
+        .instructions h2 { color: #667eea; margin-bottom: 20px; font-size: 1.5em; }
+        .os-section { margin-bottom: 25px; }
+        .os-section h3 { color: #555; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .os-section ul { margin-left: 20px; line-height: 1.8; color: #666; }
+        .os-section li { margin-bottom: 8px; }
+        .icon { font-size: 1.3em; }
         .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: none;
-            animation: slideIn 0.3s ease;
-            z-index: 1000;
+            position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white;
+            padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none; animation: slideIn 0.3s ease; z-index: 1000;
         }
-
-        .notification.show {
-            display: block;
+        .notification.show { display: block; }
+        .extra-info { text-align: center; margin-bottom: 20px; transition: all 0.3s ease; }
+        .extra-info.hidden { opacity: 0; height: 0; margin-bottom: 0; overflow: hidden; pointer-events: none; }
+        .welcome-message {
+            text-align: center; margin-bottom: 25px; padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 10px; display: none;
         }
-
+        .welcome-message.show { display: block; }
         @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .link-actions {
-                flex-direction: column;
-            }
-
-            .link-actions button {
-                min-width: 100%;
-            }
+            .container { padding: 20px; }
+            h1 { font-size: 1.5em; }
+            .button-group { flex-direction: column; }
+            .link-actions { flex-direction: column; }
+            .link-actions button { min-width: 100%; }
         }
     </style>
 </head>
@@ -278,18 +97,23 @@
     <div class="container">
         <h1>📱 Generador de Código QR</h1>
         
-        <div class="input-group">
+        <div class="welcome-message" id="welcomeMessage">
+            <h3>✅ Enlace precargado desde el QR</h3>
+            <p>Este enlace está listo para copiar:</p>
+        </div>
+        
+        <div class="input-group" id="inputGroup">
             <label for="urlInput">Introduce tu enlace:</label>
-            <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/...">
+            <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/AKfycbz8qS30EqhNVlF8ogrnUAz7cy9vbwcMkZ0GGsA8x_ezbXxgTG5w1Os_fnwi-jdecVy9Sg/exec">
         </div>
 
-        <div class="button-group">
+        <div class="button-group" id="buttonGroup">
             <button class="btn-generate" onclick="generateQR()">Generar QR</button>
             <button class="btn-copy" onclick="copyLink()">📋 Copiar Enlace</button>
             <button class="btn-download" id="btnDownload" onclick="downloadQR()" disabled>⬇️ Descargar QR</button>
         </div>
 
-        <div style="text-align: center; margin-bottom: 20px;">
+        <div class="extra-info" id="extraInfo">
             <button class="btn-generate" onclick="generateThisPageQR()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                 🔗 Generar QR con Este Enlace
             </button>
@@ -302,7 +126,6 @@
             <div id="qrcode"></div>
         </div>
 
-        <!-- Nueva sección que se muestra solo cuando se genera el QR con enlace -->
         <div class="link-display" id="linkDisplay">
             <h3>🔗 Enlace incluido en el QR:</h3>
             <p id="linkDisplayText"></p>
@@ -317,7 +140,6 @@
 
         <div class="instructions">
             <h2>📖 Instrucciones para abrir el enlace</h2>
-            
             <div class="os-section">
                 <h3><span class="icon">💻</span> Windows</h3>
                 <ul>
@@ -333,7 +155,6 @@
                     <li><strong>⚠️ Si se abre Google Drive:</strong> Usa el modo incógnito para ver la app web correctamente</li>
                 </ul>
             </div>
-
             <div class="os-section">
                 <h3><span class="icon">🍎</span> Mac</h3>
                 <ul>
@@ -348,7 +169,6 @@
                     <li><strong>⚠️ Si se abre Google Drive:</strong> Usa el modo incógnito para ver la app web correctamente</li>
                 </ul>
             </div>
-
             <div class="os-section">
                 <h3><span class="icon">📱</span> Android</h3>
                 <ul>
@@ -364,7 +184,6 @@
                     <li><strong>⚠️ Si se abre la app de Google Drive:</strong> Usa el modo incógnito en el navegador para ver la app web</li>
                 </ul>
             </div>
-
             <div class="os-section">
                 <h3><span class="icon">📲</span> iPhone/iPad</h3>
                 <ul>
@@ -385,15 +204,24 @@
         </div>
     </div>
 
-    <div class="notification" id="notification">
-        ✅ Enlace copiado al portapapeles
-    </div>
+    <div class="notification" id="notification">✅ Enlace copiado al portapapeles</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         let qrcodeInstance = null;
         let currentGeneratedUrl = '';
+        
+        // ⭐⭐ CAMBIO CLAVE: URL FIJA DE GITHUB PAGES ⭐⭐
+        const GITHUB_PAGES_URL = 'https://morfeo11-alt.github.io/generador-qr/';
 
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        // ⭐⭐ FUNCIÓN CORREGIDA: Usa siempre la URL de GitHub ⭐⭐
         function generateThisPageQR() {
             const url = document.getElementById('urlInput').value.trim();
             
@@ -407,50 +235,64 @@
                 return;
             }
 
-            // Crear la URL con el parámetro
-            const currentUrl = window.location.href.split('?')[0];
-            const fullUrl = currentUrl + '?url=' + encodeURIComponent(url);
-            
-            const qrContainer = document.getElementById('qrContainer');
-            const qrcodeDiv = document.getElementById('qrcode');
-            const btnDownload = document.getElementById('btnDownload');
-            const linkDisplay = document.getElementById('linkDisplay');
-            const linkDisplayText = document.getElementById('linkDisplayText');
+            try {
+                // ⭐⭐ CAMBIO: Usar la URL de GitHub Pages en lugar de la local ⭐⭐
+                const fullUrl = GITHUB_PAGES_URL + '?url=' + encodeURIComponent(url);
+                console.log('Generando QR para:', fullUrl);
+                
+                const qrContainer = document.getElementById('qrContainer');
+                const qrcodeDiv = document.getElementById('qrcode');
+                const linkDisplay = document.getElementById('linkDisplay');
+                const linkDisplayText = document.getElementById('linkDisplayText');
 
-            // Limpiar QR anterior
-            qrcodeDiv.innerHTML = '';
+                // Limpiar QR anterior
+                qrcodeDiv.innerHTML = '';
 
-            // Crear nuevo QR
-            qrcodeInstance = new QRCode(qrcodeDiv, {
-                text: fullUrl,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+                // Verificar que la biblioteca esté cargada
+                if (typeof QRCode === 'undefined') {
+                    alert('Error: La biblioteca QRCode no está cargada. Recarga la página.');
+                    return;
+                }
 
-            // Mostrar el QR
-            qrContainer.classList.add('show');
-            
-            // Mostrar el enlace y el botón de copiar
-            linkDisplayText.textContent = url; // Mostrar el enlace original, no la URL con parámetro
-            linkDisplay.classList.add('show');
-            
-            // Habilitar botón de descarga
-            btnDownload.disabled = false;
-            
-            // Guardar la URL para copiar
-            currentGeneratedUrl = url; // Guardar el enlace original, no la URL con parámetro
+                // Crear nuevo QR
+                qrcodeInstance = new QRCode(qrcodeDiv, {
+                    text: fullUrl,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
 
-            // Mostrar notificación
-            const notification = document.getElementById('notification');
-            notification.textContent = '✅ QR generado con el enlace precargado';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+                // Mostrar el QR
+                qrContainer.classList.add('show');
+                
+                // Mostrar el enlace original (no la URL de GitHub)
+                linkDisplayText.textContent = url;
+                linkDisplay.classList.add('show');
+                
+                // Habilitar botón de descarga
+                document.getElementById('btnDownload').disabled = false;
+                
+                // Guardar la URL para copiar
+                currentGeneratedUrl = url;
+
+                // Ocultar elementos del formulario
+                setTimeout(() => {
+                    hideFormElements();
+                }, 300);
+
+                showNotification('✅ QR generado con el enlace precargado');
+                
+                // Información adicional
+                console.log('QR generado correctamente');
+                console.log('URL en el QR:', fullUrl);
+                console.log('Enlace original:', url);
+                
+            } catch (error) {
+                console.error('Error al generar el QR:', error);
+                alert('Error al generar el código QR: ' + error.message);
+            }
         }
 
         function generateQR() {
@@ -459,6 +301,7 @@
             const qrcodeDiv = document.getElementById('qrcode');
             const btnDownload = document.getElementById('btnDownload');
             const linkDisplay = document.getElementById('linkDisplay');
+            const welcomeMessage = document.getElementById('welcomeMessage');
 
             if (!url) {
                 alert('Por favor, introduce un enlace');
@@ -470,48 +313,49 @@
                 return;
             }
 
+            showFormElements();
+            welcomeMessage.classList.remove('show');
             qrcodeDiv.innerHTML = '';
 
-            qrcodeInstance = new QRCode(qrcodeDiv, {
-                text: url,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            try {
+                if (typeof QRCode === 'undefined') {
+                    alert('Error: La biblioteca QRCode no está cargada. Recarga la página.');
+                    return;
+                }
 
-            qrContainer.classList.add('show');
-            btnDownload.disabled = false;
-            
-            // Ocultar la sección de enlace si está visible
-            linkDisplay.classList.remove('show');
-            
-            // Guardar la URL para copiar
-            currentGeneratedUrl = url;
+                qrcodeInstance = new QRCode(qrcodeDiv, {
+                    text: url,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                qrContainer.classList.add('show');
+                btnDownload.disabled = false;
+                linkDisplay.classList.remove('show');
+                currentGeneratedUrl = url;
+                showNotification('✅ QR generado correctamente');
+                
+            } catch (error) {
+                console.error('Error al generar el QR:', error);
+                alert('Error al generar el código QR: ' + error.message);
+            }
         }
 
         function downloadQR() {
             const canvas = document.querySelector('#qrcode canvas');
-            
             if (!canvas) {
                 alert('Primero debes generar un código QR');
                 return;
             }
-
             const url = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.download = 'codigo-qr.png';
             link.href = url;
             link.click();
-
-            const notification = document.getElementById('notification');
-            notification.textContent = '✅ Código QR descargado';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            showNotification('✅ Código QR descargado');
         }
 
         function copyDisplayedLink() {
@@ -519,15 +363,8 @@
                 alert('Primero debes generar un código QR');
                 return;
             }
-
             navigator.clipboard.writeText(currentGeneratedUrl).then(() => {
-                const notification = document.getElementById('notification');
-                notification.textContent = '✅ Enlace copiado al portapapeles';
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
+                showNotification('✅ Enlace copiado al portapapeles');
             }).catch(err => {
                 alert('Error al copiar el enlace');
                 console.error('Error:', err);
@@ -536,33 +373,35 @@
 
         function copyLink() {
             const url = document.getElementById('urlInput').value.trim();
-            
             if (!url) {
                 alert('Por favor, introduce un enlace primero');
                 return;
             }
-
             navigator.clipboard.writeText(url).then(() => {
-                const notification = document.getElementById('notification');
-                notification.textContent = '✅ Enlace copiado al portapapeles';
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
+                showNotification('✅ Enlace copiado al portapapeles');
             }).catch(err => {
                 alert('Error al copiar el enlace');
                 console.error('Error:', err);
             });
         }
 
+        function hideFormElements() {
+            document.getElementById('inputGroup').classList.add('hidden');
+            document.getElementById('buttonGroup').classList.add('hidden');
+            document.getElementById('extraInfo').classList.add('hidden');
+        }
+
+        function showFormElements() {
+            document.getElementById('inputGroup').classList.remove('hidden');
+            document.getElementById('buttonGroup').classList.remove('hidden');
+            document.getElementById('extraInfo').classList.remove('hidden');
+        }
+
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateQR();
-            }
+            if (e.key === 'Enter') generateQR();
         });
 
-        // Cargar URL desde parámetro si existe
+        // Cargar URL desde parámetro
         window.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const preloadedUrl = urlParams.get('url');
@@ -570,15 +409,12 @@
             if (preloadedUrl) {
                 const decodedUrl = decodeURIComponent(preloadedUrl);
                 document.getElementById('urlInput').value = decodedUrl;
-                
-                // Mostrar notificación
-                const notification = document.getElementById('notification');
-                notification.textContent = '✅ Enlace precargado desde el QR';
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
+                hideFormElements();
+                document.getElementById('welcomeMessage').classList.add('show');
+                document.getElementById('linkDisplayText').textContent = decodedUrl;
+                document.getElementById('linkDisplay').classList.add('show');
+                currentGeneratedUrl = decodedUrl;
+                showNotification('✅ Enlace precargado desde el QR');
             }
         });
     </script>
